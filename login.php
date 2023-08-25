@@ -1,55 +1,3 @@
-<?php
-include 'db.php';
-
-if (isset($_POST['submit'])) {
-
-   // jika data kosong
-   if ($_POST['username'] == '' || $_POST['password'] == '') {
-      echo "
-         <script>
-         alert('Lengkapi data form');
-         history.back();
-         </script>
-      ";
-      return false;
-   }
-
-   global $conn;
-   $username = $_POST['username'];
-   $password = $_POST['password'];
-
-   $get = mysqli_query($conn, "SELECT * FROM user WHERE password = '$password' AND username = '$username'");
-
-   $result =  mysqli_num_rows($get);
-   // var_dump($result);
-
-   // jika sukses query
-   if ($result >  0) {
-      $data = mysqli_fetch_assoc($get);
-
-      session_start();
-      $_SESSION['sukses_login'] = true;
-      $_SESSION['nama'] = $data['nama'];
-      
-      echo "
-         <script>
-         alert('Sukses Login');
-         location.href = 'index.php';
-         </script>
-      ";
-
-   } else {
-      echo "
-         <script>
-         alert('Gagal Login');
-         history.back();
-         </script>
-      ";
-   }
-}
-
-?>
-
 <!doctype html>
 <html lang="en">
 
@@ -82,7 +30,78 @@ if (isset($_POST['submit'])) {
 
    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.27/dist/sweetalert2.all.min.js"></script>
+   <?php
+   // var_dump($_SESSION['sukses_regis']);
+   session_start();
 
+   if (isset($_SESSION['sukses_regis'])) { ?>
+      <script>
+         Swal.fire({
+            title: 'Sukses Register',
+            text: 'Silahkan login menggunakan akun anda',
+            icon: 'success'
+         });
+      </script>
+   <?php
+      session_unset();
+   }  ?>
+
+
+   <?php
+   include 'db.php';
+   if (isset($_POST['submit'])) {
+      global $conn;
+      $username = $_POST['username'];
+      $password = $_POST['password'];
+
+      // jika data kosong
+      if ($username == '' || $password == '') {
+         echo "
+         <script>
+         console.log(false);
+         Swal.fire({
+            title: 'Gagal Login',
+            text: 'Silahkan cek form anda',
+            icon: 'error'
+         });
+         </script>
+      ";
+      } else {
+
+         $get = mysqli_query($conn, "SELECT * FROM user WHERE password = '$password' AND username = '$username'");
+
+         $result =  mysqli_num_rows($get);
+         // var_dump($result);
+
+         // jika sukses query
+         if ($result >  0) {
+            $data = mysqli_fetch_assoc($get);
+
+            session_start();
+            $_SESSION['sukses_login'] = true;
+            $_SESSION['nama'] = $data['nama'];
+
+            echo "
+            <script>
+               location.href = 'index.php';
+            </script>
+         ";
+         } else {
+            echo "
+            <script>
+            console.log(false);
+            Swal.fire({
+               title: 'Gagal Login',
+               text: 'Terjadi kesalahan',
+               icon: 'error'
+            });
+            </script>
+         ";
+         }
+      }
+   }
+
+   ?>
 </body>
 
 </html>
