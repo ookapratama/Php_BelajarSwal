@@ -1,3 +1,55 @@
+<?php
+include 'db.php';
+
+if (isset($_POST['submit'])) {
+
+   // jika data kosong
+   if ($_POST['username'] == '' || $_POST['password'] == '') {
+      echo "
+         <script>
+         alert('Lengkapi data form');
+         history.back();
+         </script>
+      ";
+      return false;
+   }
+
+   global $conn;
+   $username = $_POST['username'];
+   $password = $_POST['password'];
+
+   $get = mysqli_query($conn, "SELECT * FROM user WHERE password = '$password' AND username = '$username'");
+
+   $result =  mysqli_num_rows($get);
+   // var_dump($result);
+
+   // jika sukses query
+   if ($result >  0) {
+      $data = mysqli_fetch_assoc($get);
+
+      session_start();
+      $_SESSION['sukses_login'] = true;
+      $_SESSION['nama'] = $data['nama'];
+      
+      echo "
+         <script>
+         alert('Sukses Login');
+         location.href = 'index.php';
+         </script>
+      ";
+
+   } else {
+      echo "
+         <script>
+         alert('Gagal Login');
+         history.back();
+         </script>
+      ";
+   }
+}
+
+?>
+
 <!doctype html>
 <html lang="en">
 
@@ -22,7 +74,7 @@
          <input type="password" placeholder="Masukkan password" name="password" class="form-control">
          <div class="d-flex justify-content-between ">
             <span class="mt-4">Belum punya akun ? <a href="register.php" class="text-warning"> Register</a></span>
-            <button class="btn btn-primary mt-4 px-5 py-2 rounded-pill">Login</button>
+            <button type="submit" name="submit" class="btn btn-primary mt-4 px-5 py-2 rounded-pill">Login</button>
          </div>
       </div>
 
@@ -30,6 +82,7 @@
 
    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.27/dist/sweetalert2.all.min.js"></script>
+
 </body>
 
 </html>
